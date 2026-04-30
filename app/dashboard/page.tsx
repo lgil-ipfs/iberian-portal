@@ -43,8 +43,8 @@ export default async function DashboardPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
             <nav style={{ display: 'flex', gap: '25px', color: 'rgba(255,255,255,0.85)', fontSize: '14px', fontWeight: 500 }}>
               <a href="/dashboard" style={{ color: 'var(--white)', borderBottom: '2px solid var(--gold)', paddingBottom: '4px' }}>Overview</a>
-              <a href="#investments" style={{ color: 'inherit' }}>Investments</a>
-              <a href="#protection" style={{ color: 'inherit' }}>Protection</a>
+              <a href="/education" style={{ color: 'inherit' }}>Education</a>
+              <a href="https://iberianpacific.ca/insights" style={{ color: 'inherit' }}>Insights</a>
             </nav>
             <div style={{ paddingLeft: '15px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
               <UserButton />
