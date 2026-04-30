@@ -47,7 +47,7 @@ export default async function DashboardPage() {
               <a href="#protection" style={{ color: 'inherit' }}>Protection</a>
             </nav>
             <div style={{ paddingLeft: '15px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
-              <UserButton afterSignOutUrl="/sign-in" />
+              <UserButton />
             </div>
           </div>
         </div>
@@ -215,14 +215,6 @@ export default async function DashboardPage() {
         </div>
       </footer>
 
-      <style jsx global>{`
-        .portal-root {
-          --font-display: "Cormorant Garamond", serif;
-          --font-body: "Jost", sans-serif;
-        }
-        h1, h2, h3 { font-family: var(--font-display) !important; }
-        body { font-family: var(--font-body) !important; }
-      `}</style>
     </div>
   )
 }
