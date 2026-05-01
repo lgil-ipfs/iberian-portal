@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata = {
   title: 'Iberian Pacific | Client Portal',
   description: 'Your private financial dashboard.',
+  icons: {
+    icon: '/favicon.png',
+  },
 }
 
 export default function RootLayout({
