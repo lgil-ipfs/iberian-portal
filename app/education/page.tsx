@@ -41,6 +41,7 @@ export default async function EducationPage() {
             <nav style={{ display: 'flex', gap: '25px', color: 'rgba(255,255,255,0.85)', fontSize: '14px', fontWeight: 500 }}>
               <a href="/dashboard" style={{ color: 'inherit' }}>Overview</a>
               <a href="/education" style={{ color: 'var(--white)', borderBottom: '2px solid var(--gold)', paddingBottom: '4px' }}>Education</a>
+              <a href="/benefits" style={{ color: 'inherit' }}>Benefits Plan</a>
               <a href="https://iberianpacific.ca/insights" style={{ color: 'inherit' }}>Insights</a>
             </nav>
             <div style={{ paddingLeft: '15px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>

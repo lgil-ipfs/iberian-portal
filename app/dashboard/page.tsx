@@ -2,7 +2,7 @@ import { currentUser } from '@clerk/nextjs/server'
 import { UserButton } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
 import { REDIRECTS } from '@/lib/redirects'
-import { INSURANCE_PLACEHOLDERS } from '@/data/insurance'
+import { INSURANCE_PLACEHOLDERS, getStageIndex, STAGES } from '@/data/insurance'
 import { CANADIAN_BANKS } from '@/data/banking'
 
 export default async function DashboardPage() {
@@ -44,6 +44,7 @@ export default async function DashboardPage() {
             <nav style={{ display: 'flex', gap: '25px', color: 'rgba(255,255,255,0.85)', fontSize: '14px', fontWeight: 500 }}>
               <a href="/dashboard" style={{ color: 'var(--white)', borderBottom: '2px solid var(--gold)', paddingBottom: '4px' }}>Overview</a>
               <a href="/education" style={{ color: 'inherit' }}>Education</a>
+              <a href="/benefits" style={{ color: 'inherit' }}>Benefits Plan</a>
               <a href="https://iberianpacific.ca/insights" style={{ color: 'inherit' }}>Insights</a>
             </nav>
             <div style={{ paddingLeft: '15px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
@@ -125,37 +126,65 @@ export default async function DashboardPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '2.5rem' }}>
             <h2 style={{ fontSize: '28px', color: 'var(--maroon-deep)', margin: 0 }}>Insurance & Protection</h2>
             <div style={{ flex: 1, height: '1px', background: 'rgba(107, 39, 55, 0.1)' }}></div>
+            <a href="/benefits" className="btn btn-secondary" style={{ fontSize: '12px', padding: '8px 18px', flexShrink: 0 }}>
+              View Benefits Plan &rarr;
+            </a>
           </div>
 
           <div style={{ background: '#fff', borderRadius: 'var(--radius)', border: '1px solid rgba(0,0,0,0.06)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-            {INSURANCE_PLACEHOLDERS.map((plan, i, arr) => (
-              <div key={plan.carrier} style={{ 
-                padding: '1.5rem 2.5rem', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                borderBottom: i < arr.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
-                transition: 'background 0.2s ease'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: plan.portalUrl ? '#3B7D4A' : '#D1D1D1' }}></div>
-                  <div>
-                    <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{plan.type}</div>
-                    <div style={{ fontSize: '18px', color: 'var(--maroon)', fontWeight: 600 }}>{plan.name}</div>
+            {INSURANCE_PLACEHOLDERS.map((plan, i, arr) => {
+              const stageIdx = getStageIndex(plan.underwritingStage)
+              const stage = STAGES[stageIdx]
+              const isInForce = plan.underwritingStage === 'in_force'
+              const pendingCount = [
+                ...(plan.initialRequirements ?? []),
+                ...(plan.followupRequirements ?? []),
+              ].filter((r) => r.status === 'pending').length
+
+              return (
+                <div key={plan.id} style={{
+                  padding: '1.5rem 2.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  borderBottom: i < arr.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: isInForce ? '#3B7D4A' : 'var(--gold)', flexShrink: 0 }}></div>
+                    <div>
+                      <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{plan.type}</div>
+                      <div style={{ fontSize: '18px', color: 'var(--maroon)', fontWeight: 600 }}>{plan.name}</div>
+                      <div style={{ fontSize: '12px', color: '#999', marginTop: '2px' }}>{plan.carrier}{plan.coverageAmount ? ` · ${plan.coverageAmount}` : ''}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                        fontSize: '11px', fontWeight: 700,
+                        background: isInForce ? 'rgba(34,140,80,0.08)' : pendingCount > 0 ? 'rgba(220,80,40,0.08)' : 'rgba(201,168,76,0.1)',
+                        border: isInForce ? '1px solid rgba(34,140,80,0.2)' : pendingCount > 0 ? '1px solid rgba(220,80,40,0.2)' : '1px solid rgba(201,168,76,0.2)',
+                        color: isInForce ? '#186038' : pendingCount > 0 ? '#b33a1a' : '#8a6e20',
+                        borderRadius: '999px', padding: '4px 12px',
+                      }}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor', flexShrink: 0 }}></span>
+                        {isInForce ? 'In Force' : stage?.shortLabel ?? 'In Progress'}
+                      </div>
+                      {pendingCount > 0 && !isInForce && (
+                        <div style={{ fontSize: '11px', color: '#b33a1a', fontWeight: 600, marginTop: '4px', textAlign: 'right' }}>
+                          {pendingCount} action{pendingCount > 1 ? 's' : ''} needed
+                        </div>
+                      )}
+                    </div>
+                    <a href={`/benefits/${plan.id}`} className="btn btn-secondary" style={{ padding: '8px 18px', fontSize: '12px' }}>
+                      Track Application &rarr;
+                    </a>
                   </div>
                 </div>
-                <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '40px' }}>
-                  <div style={{ fontSize: '14px', color: '#777', fontWeight: 500 }}>{plan.carrier}</div>
-                  {plan.portalUrl ? (
-                    <a href={plan.portalUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '8px 18px', fontSize: '12px' }}>
-                      Carrier Portal
-                    </a>
-                  ) : (
-                    <span style={{ fontSize: '12px', color: '#999', fontStyle: 'italic' }}>Pending Review</span>
-                  )}
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </section>
 
